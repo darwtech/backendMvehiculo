@@ -33,8 +33,10 @@ const createVehiculoMantenimiento = async (data) => {
     return vehiculoMantenimiento;
 };
 
+
 const generateAlerta = (titulo, fecha, kilometraje) => {
     if (titulo.toLowerCase() === 'cambio de aceite') {
+        // Suponiendo que 'kilometraje' ya es el valor acumulado más reciente
         return `Próximo cambio en ${kilometraje + 5000} km`;
     } else if (titulo.toLowerCase() === 'lavado') {
         const fechaAlerta = new Date(fecha);
@@ -44,6 +46,7 @@ const generateAlerta = (titulo, fecha, kilometraje) => {
         return 'Tipo de mantenimiento desconocido';
     }
 };
+
 
 const getVehiculoMantenimientos = async () => {
     return await VehiculoMantenimiento.find();
@@ -62,26 +65,30 @@ const updateVehiculoMantenimiento = async (id, data) => {
         throw new Error('Vehículo no encontrado con la placa proporcionada');
     }
 
-    const alerta = generateAlerta(mantenimiento.titulo, fecha, kilometraje);
-
-    const vehiculoMantenimientoActualizado = await VehiculoMantenimiento.findByIdAndUpdate(
-        id,
-        {
-            fecha,
-            codigo,
-            placa,
-            marca_producto,
-            kilometraje,
-            alerta
-        },
-        { new: true }
-    );
-
-    if (!vehiculoMantenimientoActualizado) {
+    // Encuentra el mantenimiento del vehículo existente
+    const vehiculoMantenimientoExistente = await VehiculoMantenimiento.findById(id);
+    if (!vehiculoMantenimientoExistente) {
         throw new Error('Registro de mantenimiento no encontrado');
     }
-    return vehiculoMantenimientoActualizado;
+
+    // Calcula el nuevo kilometraje
+    const nuevoKilometraje = kilometraje;
+
+    // Genera la nueva alerta basada en el tipo de mantenimiento
+    const alerta = generateAlerta(mantenimiento.titulo, vehiculoMantenimientoExistente.fecha, nuevoKilometraje);
+
+    // Actualiza el registro de mantenimiento del vehículo
+    vehiculoMantenimientoExistente.fecha = fecha;
+    vehiculoMantenimientoExistente.codigo = codigo;
+    vehiculoMantenimientoExistente.placa = placa;
+    vehiculoMantenimientoExistente.marca_producto = marca_producto;
+    vehiculoMantenimientoExistente.kilometraje = nuevoKilometraje;
+    vehiculoMantenimientoExistente.alerta = alerta;
+
+    await vehiculoMantenimientoExistente.save();
+    return vehiculoMantenimientoExistente;
 };
+
 
 const filtrarVehiculoMantenimientos = async (search) => {
     const regex = new RegExp(search, 'i');
@@ -95,24 +102,11 @@ const filtrarVehiculoMantenimientos = async (search) => {
     });
 };
 
-const checkAndUpdateAlerta = async () => {
-    const vehiculosMantenimiento = await VehiculoMantenimiento.find().populate('codigo');
-    const updates = vehiculosMantenimiento.map(async vm => {
-        if (vm.codigo.titulo.toLowerCase() === 'cambio de aceite') {
-            const nuevaAlerta = generateAlerta(vm.codigo.titulo, vm.fecha, vm.kilometraje);
-            if (vm.alerta !== nuevaAlerta) {
-                vm.alerta = nuevaAlerta;
-                await vm.save();
-            }
-        }
-    });
-    await Promise.all(updates);
-};
+
 
 module.exports = {
     createVehiculoMantenimiento,
     getVehiculoMantenimientos,
     updateVehiculoMantenimiento,
-    filtrarVehiculoMantenimientos,
-    checkAndUpdateAlerta
+    filtrarVehiculoMantenimientos
 };
