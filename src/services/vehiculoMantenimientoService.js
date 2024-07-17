@@ -15,13 +15,15 @@ const createVehiculoMantenimiento = async (data) => {
         throw new Error('Vehículo no encontrado con la placa proporcionada');
     }
 
+    const alerta = generateAlerta(mantenimiento.titulo, fecha, kilometraje);
+
     const vehiculoMantenimiento = new VehiculoMantenimiento({
         fecha,
         codigo,
         placa,
         marca_producto,
         kilometraje,
-        alerta: generateAlerta(mantenimiento.titulo, fecha, kilometraje)
+        alerta
     });
 
     await vehiculoMantenimiento.save();
@@ -42,8 +44,8 @@ const generateAlerta = (titulo, fecha, kilometraje) => {
 
 const getVehiculoMantenimientos = async () => {
     return await VehiculoMantenimiento.find()
-        .populate('id_mantenimiento')
-        .populate('id_vehiculo');
+        .populate('codigo', 'titulo descripcion')
+        .populate('placa', 'imagen placa marca modelo');
 };
 
 const updateVehiculoMantenimiento = async (id, data) => {
@@ -59,6 +61,8 @@ const updateVehiculoMantenimiento = async (id, data) => {
         throw new Error('Vehículo no encontrado con la placa proporcionada');
     }
 
+    const alerta = generateAlerta(mantenimiento.titulo, fecha, kilometraje);
+
     const vehiculoMantenimientoActualizado = await VehiculoMantenimiento.findByIdAndUpdate(
         id,
         {
@@ -67,7 +71,7 @@ const updateVehiculoMantenimiento = async (id, data) => {
             placa,
             marca_producto,
             kilometraje,
-            alerta: generateAlerta(mantenimiento.titulo, fecha, kilometraje)
+            alerta
         },
         { new: true }
     );
@@ -90,9 +94,24 @@ const filtrarVehiculoMantenimientos = async (search) => {
     });
 };
 
+const checkAndUpdateAlerta = async () => {
+    const vehiculosMantenimiento = await VehiculoMantenimiento.find().populate('codigo');
+    const updates = vehiculosMantenimiento.map(async vm => {
+        if (vm.codigo.titulo.toLowerCase() === 'cambio de aceite') {
+            const nuevaAlerta = generateAlerta(vm.codigo.titulo, vm.fecha, vm.kilometraje);
+            if (vm.alerta !== nuevaAlerta) {
+                vm.alerta = nuevaAlerta;
+                await vm.save();
+            }
+        }
+    });
+    await Promise.all(updates);
+};
+
 module.exports = {
     createVehiculoMantenimiento,
     getVehiculoMantenimientos,
     updateVehiculoMantenimiento,
-    filtrarVehiculoMantenimientos
+    filtrarVehiculoMantenimientos,
+    checkAndUpdateAlerta
 };
