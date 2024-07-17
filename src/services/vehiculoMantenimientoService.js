@@ -5,16 +5,19 @@ const Vehiculo = require('../models/Vehiculo.models');
 const createVehiculoMantenimiento = async (data) => {
     const { codigo, placa, fecha, marca_producto, kilometraje } = data;
 
+    // Busca el mantenimiento por código
     const mantenimiento = await Mantenimiento.findOne({ codigo });
     if (!mantenimiento) {
         throw new Error('Mantenimiento no encontrado con el código proporcionado');
     }
 
+    // Busca el vehículo por placa
     const vehiculo = await Vehiculo.findOne({ placa });
     if (!vehiculo) {
         throw new Error('Vehículo no encontrado con la placa proporcionada');
     }
 
+    // Crea la alerta
     const alerta = generateAlerta(mantenimiento.titulo, fecha, kilometraje);
 
     const vehiculoMantenimiento = new VehiculoMantenimiento({
@@ -43,9 +46,7 @@ const generateAlerta = (titulo, fecha, kilometraje) => {
 };
 
 const getVehiculoMantenimientos = async () => {
-    return await VehiculoMantenimiento.find()
-        .populate('codigo', 'titulo descripcion')
-        .populate('placa', 'imagen placa marca modelo');
+    return await VehiculoMantenimiento.find();
 };
 
 const updateVehiculoMantenimiento = async (id, data) => {
