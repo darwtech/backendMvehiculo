@@ -36,11 +36,10 @@ const createVehiculoMantenimiento = async (data) => {
 
 const generateAlerta = (titulo, fecha, kilometraje) => {
     if (titulo.toLowerCase() === 'cambio de aceite') {
-        // Suponiendo que 'kilometraje' ya es el valor acumulado más reciente
         return `Próximo cambio en ${kilometraje + 5000} km`;
     } else if (titulo.toLowerCase() === 'lavado') {
         const fechaAlerta = new Date(fecha);
-        fechaAlerta.setDate(fechaAlerta.getDate() + 30);
+        fechaAlerta.setDate(fechaAlerta.getDate() + 12);
         return `Próximo lavado el ${fechaAlerta.toDateString()}`;
     } else {
         return 'Tipo de mantenimiento desconocido';

@@ -12,6 +12,6 @@ router.post('/vehiculo-mantenimientos', createVehiculoMantenimiento);
 router.get('/vehiculo-mantenimientos', getVehiculoMantenimientos);
 router.put('/vehiculo-mantenimientos/:id', updateVehiculoMantenimiento);
 router.get('/vehiculo-mantenimientos/filtrar', filtrarVehiculoMantenimientos);
-router.get('/vehiculo-mantenimientos/alertas', checkAndUpdateAlerta);
+//router.get('/vehiculo-mantenimientos/alertas', checkAndUpdateAlerta);
 
 module.exports = router;

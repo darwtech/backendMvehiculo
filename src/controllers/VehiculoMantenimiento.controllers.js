@@ -38,19 +38,12 @@ const filtrarVehiculoMantenimientos = async (req, res) => {
     }
 };
 
-const checkAndUpdateAlerta = async (req, res) => {
-    try {
-        await VehiculoMantenimientoService.checkAndUpdateAlerta();
-        res.status(200).json({ message: 'Alertas actualizadas' });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+
 
 module.exports = {
     createVehiculoMantenimiento,
     getVehiculoMantenimientos,
     updateVehiculoMantenimiento,
     filtrarVehiculoMantenimientos,
-    checkAndUpdateAlerta
+
 };
