@@ -3,7 +3,7 @@ const Mantenimiento = require('../models/Mantenimiento.models');
 const Vehiculo = require('../models/Vehiculo.models');
 
 const createVehiculoMantenimiento = async (data) => {
-    const { codigo, placa, fecha, marca_producto, kilometraje } = data;
+    const { codigo, placa, fecha, marca_producto, kilometraje,precio } = data;
 
     // Busca el mantenimiento por código
     const mantenimiento = await Mantenimiento.findOne({ codigo });
@@ -26,7 +26,7 @@ const createVehiculoMantenimiento = async (data) => {
         placa,
         marca_producto,
         kilometraje,
-        alerta
+        alerta,precio
     });
 
     await vehiculoMantenimiento.save();
@@ -83,6 +83,7 @@ const updateVehiculoMantenimiento = async (id, data) => {
     vehiculoMantenimientoExistente.marca_producto = marca_producto;
     vehiculoMantenimientoExistente.kilometraje = nuevoKilometraje;
     vehiculoMantenimientoExistente.alerta = alerta;
+    vehiculoMantenimientoExistente.precio = precio;
 
     await vehiculoMantenimientoExistente.save();
     return vehiculoMantenimientoExistente;

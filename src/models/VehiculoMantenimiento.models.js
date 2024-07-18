@@ -7,7 +7,8 @@ const vehiculoMantenimientoSchema = new Schema({
     placa: { type: String, required: true },
     marca_producto: { type: String, required: true },
     kilometraje: { type: Number, required: true },
-    alerta: { type: String, required: true }
+    alerta: { type: String, required: true },
+    precio: { type: String, required: true }
 });
 
 module.exports = mongoose.model('VehiculoMantenimiento', vehiculoMantenimientoSchema);
