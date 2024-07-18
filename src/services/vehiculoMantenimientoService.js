@@ -52,7 +52,7 @@ const getVehiculoMantenimientos = async () => {
 };
 
 const updateVehiculoMantenimiento = async (id, data) => {
-    const { codigo, placa, fecha, marca_producto, kilometraje } = data;
+    const { codigo, placa, fecha, marca_producto, kilometraje,precio } = data;
 
     const mantenimiento = await Mantenimiento.findOne({ codigo });
     if (!mantenimiento) {
